@@ -26,25 +26,22 @@ public class MovieApp extends Application {
     }
 
     public void init() throws Exception {
-        String url = "jdbc:mysql://localhost:3306/mydb";
-        String username = "root";
-        String password = "12345";
-
-        dbHandler = new DatabaseHandler(url, username, password);
-
-        ResultSet resultSet = dbHandler.executeQuery("SELECT * FROM Movies");
+        AppInitializer appInitializer  = new AppInitializer();
+        dbHandler = appInitializer.initialize();
     }
 
     @Override
     public void start(Stage stage) throws Exception {
         // Creating window and button
         HBox layout = new HBox(5);
+        layout.setStyle("-fx-control-inner-background: lightblue; -fx-text-fill: black;");
         Button searchBt = new Button("Search");
         searchBt.setDisable(true);
 
         displayArea.setEditable(false);
         displayArea.setPrefWidth(400); // Set an appropriate width
         displayArea.setPrefHeight(300);
+        displayArea.setStyle("-fx-control-inner-background: lightblue; -fx-text-fill: black;");
 
         // Choice box for search options
         ChoiceBox<String> searchOptions = new ChoiceBox<>();
@@ -137,7 +134,7 @@ public class MovieApp extends Application {
                 int releaseYear = resultSet.getInt("ReleaseYear");
                 String actorName = resultSet.getString("actorname");
 
-                String movieInfo = movieTitle + ", " + releaseYear + ", " + actorName;
+                String movieInfo = movieTitle + ", " + releaseYear + ", Main Role: " + actorName;
                 // Append the movie info to your display area (assuming you have a TextArea or similar component)
                 displayArea.appendText(movieInfo + "\n");
             }
