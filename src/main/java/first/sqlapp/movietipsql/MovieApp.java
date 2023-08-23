@@ -10,9 +10,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -25,14 +22,15 @@ public class MovieApp extends Application {
         launch(args);
     }
 
+    //init override - loading database
     public void init() throws Exception {
-        AppInitializer appInitializer  = new AppInitializer();
+        AppInitializer appInitializer = new AppInitializer();
         dbHandler = appInitializer.initialize();
     }
 
     @Override
     public void start(Stage stage) throws Exception {
-        // Creating window and button
+        // Creating layout, button, setting text area and colors
         HBox layout = new HBox(5);
         layout.setStyle("-fx-control-inner-background: lightblue; -fx-text-fill: black;");
         Button searchBt = new Button("Search");
@@ -43,24 +41,24 @@ public class MovieApp extends Application {
         displayArea.setPrefHeight(300);
         displayArea.setStyle("-fx-control-inner-background: lightblue; -fx-text-fill: black;");
 
-        // Choice box for search options
+        // Choice box for 2 search options
         ChoiceBox<String> searchOptions = new ChoiceBox<>();
         searchOptions.getItems().addAll("Search by Year", "Search by Actor");
         searchOptions.setValue(""); // Blank initial option
 
-        // Create choices menu for year
+        // Years menu (bind observablelist to choicebox)
         ChoiceBox<Integer> yearChoice = new ChoiceBox<>();
         ObservableList<Integer> yearList = dbHandler.getYears();
         yearChoice.setItems(yearList);
         yearChoice.setDisable(true);
 
-        // Create choices menu for actors
+        // Actors menu (bind observablelist to choicebox)
         ChoiceBox<String> actorChoice = new ChoiceBox<>();
         ObservableList<String> actorsList = dbHandler.getActors();
         actorChoice.setItems(actorsList);
         actorChoice.setDisable(true);
 
-        // Listener to enable/disable year and actor choices based on selected search option
+        //Listener to enable year or actor choices based on selected search option
         searchOptions.valueProperty().addListener((observable, oldValue, newValue) -> {
             yearChoice.setDisable(true);
             actorChoice.setDisable(true);
@@ -73,7 +71,7 @@ public class MovieApp extends Application {
             }
         });
 
-        // Listener to enable search button when year or actor is selected
+        //Listener to enable search button when year or actor is selected
         yearChoice.valueProperty().addListener((observable, oldValue, newValue) -> {
             searchBt.setDisable(newValue == null && actorChoice.getValue() == null);
         });
@@ -82,7 +80,7 @@ public class MovieApp extends Application {
             searchBt.setDisable(newValue == null && yearChoice.getValue() == null);
         });
 
-        // Button event handling
+        // Button "search" event handling
         searchBt.setOnAction(e -> {
             String selectedOpt = searchOptions.getValue();
             ResultSet resultSet = null;
@@ -94,6 +92,8 @@ public class MovieApp extends Application {
                         "JOIN MovieActors MA ON M.MovieID = MA.MovieID " +
                         "JOIN actors A ON MA.ActorID = A.ActorID " +
                         "WHERE M.ReleaseYear = " + selectedYear);
+                // select title, year, concat name, join based on ID into one table,
+                //filter it based on user search choice
 
             } else if (selectedOpt.equals("Search by Actor")) {
                 String selectedActor = actorChoice.getValue();
@@ -103,6 +103,8 @@ public class MovieApp extends Application {
                         "JOIN MovieActors MA ON M.MovieID = MA.MovieID " +
                         "JOIN actors A ON MA.ActorID = A.ActorID " +
                         "WHERE CONCAT(A.FirstName, ' ', A.LastName) = '" + selectedActor + "'");
+                /* select title, year, concat name, join based on ID into one table,
+                filter it based on user search choice*/
 
             }
             displayResultSetData(resultSet, selectedOpt);
@@ -124,6 +126,7 @@ public class MovieApp extends Application {
         dbHandler.closeConnection();
     }
 
+    //method for displaying resultset in readeable form
     private void displayResultSetData(ResultSet resultSet, String selectedOption) {
         // Clear any previous data in your display area
         displayArea.clear();

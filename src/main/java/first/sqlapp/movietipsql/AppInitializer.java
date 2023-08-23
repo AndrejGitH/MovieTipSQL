@@ -3,6 +3,8 @@ package first.sqlapp.movietipsql;
 import java.io.InputStream;
 import java.util.Properties;
 
+
+//class for loading data from config.properties file with DB logins
 public class AppInitializer {
     private String url;
     private String username;
@@ -12,6 +14,7 @@ public class AppInitializer {
         loadConfig();
     }
 
+    //Method for retrieving configuration data from config file
     private void loadConfig() {
         try {
             Properties properties = new Properties();
@@ -29,6 +32,7 @@ public class AppInitializer {
         }
     }
 
+    //method for initializing databasehandler from obtained config. data
     public DatabaseHandler initialize() {
         DatabaseHandler dbHandler = null;
 

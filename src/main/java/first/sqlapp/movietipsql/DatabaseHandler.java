@@ -12,14 +12,16 @@ import javafx.collections.ObservableList;
 public class DatabaseHandler {
     private Connection connection;
 
+    //set a database connection
     public DatabaseHandler(String url, String username, String password) {
         try {
-            connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(url, username, password); //method from JDBC library
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    //process query and store data to resultSet object. If query is invalid, catch exception and print error
     public ResultSet executeQuery(String query) {
         ResultSet resultSet = null;
         try {
@@ -31,6 +33,7 @@ public class DatabaseHandler {
         return resultSet;
     }
 
+    //close the database connection
     public void closeConnection() {
         try {
             if (connection != null) {
@@ -41,6 +44,7 @@ public class DatabaseHandler {
         }
     }
 
+    //create observable list, add all years to it, return this list
     public ObservableList<Integer> getYears() {
         ObservableList<Integer> yearsList = FXCollections.observableArrayList();
         try {
@@ -55,7 +59,7 @@ public class DatabaseHandler {
         }
         return yearsList;
     }
-
+    //create observable list, add all actors names to it, return this list
     public ObservableList<String> getActors() {
         ObservableList<String> actorsList = FXCollections.observableArrayList();
         try {
@@ -71,6 +75,7 @@ public class DatabaseHandler {
         return actorsList;
     }
 
+    // returns established database connection
     public Connection getConnection() {
         return connection;
     }
